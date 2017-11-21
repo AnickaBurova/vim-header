@@ -284,7 +284,8 @@ fun s:update_header_field_and_value(field, value)
     let field_without_spaces = substitute(a:field, '\s*:$', '', '')
     let field = s:create_pattern_text(field_without_spaces, 1) . '\s*.*'
     let field_add = s:create_pattern_text(a:field) . ' '
-    execute '%s/' . field . '/' . field_add . s:create_pattern_text(a:value) .'/'
+    let field_with_comment_char = g:comment_char . '.*' . field
+    execute '%s/' . field_with_comment_char . '/' . field_add . s:create_pattern_text(a:value) .'/'
 endfun
 
 " Update header field without changing it's value
@@ -578,8 +579,12 @@ fun s:has_required_headers_in_range(header_size_threshold)
     for header_field in headers_fields
         let header_field_line_nbr = search(header_field)
         if
-            \ header_field_line_nbr == 0 ||
-            \ header_field_line_nbr > a:header_size_threshold
+            \ header_field_line_nbr == 0
+            " this is commented to stop adding new header lines
+            " TODO: this needs to be check properly if it is working as it
+            " suppose
+            "||
+            "\ header_field_line_nbr > a:header_size_threshold
             call setpos(".", save_pos)
             return 0
         endif
